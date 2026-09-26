@@ -1,0 +1,363 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Simple Loot Council Guide</title>
+<meta name="description" content="Feature guide for Simple Loot Council, loot council voting for World of Warcraft retail.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f6f7f9; --surface: #ffffff; --surface-2: #eef1f5; --border: #dde2e9;
+  --text: #1b1f27; --muted: #5a6475; --accent: #2f74d6; --accent-soft: rgba(71,140,235,.12);
+  --code-bg: #eef1f5; --code-text: #1f3b66;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #111318; --surface: #181b22; --surface-2: #1f232c; --border: #2b303b;
+    --text: #e6e9ef; --muted: #9aa3b2; --accent: #478ceb; --accent-soft: rgba(71,140,235,.16);
+    --code-bg: #232833; --code-text: #b9d3ff;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #111318; --surface: #181b22; --surface-2: #1f232c; --border: #2b303b;
+  --text: #e6e9ef; --muted: #9aa3b2; --accent: #478ceb; --accent-soft: rgba(71,140,235,.16);
+  --code-bg: #232833; --code-text: #b9d3ff;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 16px; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 15px/1.6 Inter, system-ui, sans-serif; }
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.layout { display: grid; grid-template-columns: 240px minmax(0, 1fr); max-width: 1180px; margin: 0 auto; gap: 40px; padding: 0 24px; }
+nav.toc { position: sticky; top: 0; align-self: start; max-height: 100vh; overflow-y: auto; padding: 32px 0; }
+nav.toc .brand { font-weight: 700; font-size: 16px; margin-bottom: 4px; }
+nav.toc .ver { color: var(--muted); font-size: 12px; margin-bottom: 20px; }
+nav.toc ol { list-style: none; margin: 0; padding: 0; border-left: 2px solid var(--border); }
+nav.toc li a { display: block; padding: 5px 12px; margin-left: -2px; border-left: 2px solid transparent; color: var(--muted); font-size: 13.5px; }
+nav.toc li a:hover { color: var(--text); text-decoration: none; }
+nav.toc li a.active { color: var(--accent); border-left-color: var(--accent); }
+main { padding: 32px 0 80px; min-width: 0; }
+header.hero { border-bottom: 1px solid var(--border); padding-bottom: 20px; margin-bottom: 8px; }
+h1 { font-size: 32px; line-height: 1.2; margin: 0 0 8px; letter-spacing: -.01em; }
+.byline { color: var(--muted); font-size: 13px; }
+h2 { font-size: 22px; margin: 44px 0 10px; padding-top: 4px; letter-spacing: -.005em; }
+p { margin: 10px 0; }
+.lead { font-size: 16px; color: var(--muted); }
+.badge { display: inline-block; background: var(--accent-soft); color: var(--accent); font-weight: 600; font-size: 12px; padding: 2px 8px; border-radius: 999px; }
+code { font: 500 12.5px/1.4 "JetBrains Mono", ui-monospace, monospace; background: var(--code-bg); color: var(--code-text); padding: 1px 5px; border-radius: 4px; white-space: nowrap; }
+ol.steps, ul.plain { padding-left: 22px; }
+ol.steps li, ul.plain li { margin: 6px 0; }
+.table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); margin: 14px 0; }
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th { text-align: left; font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); background: var(--surface-2); }
+th, td { padding: 9px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
+tr:last-child td { border-bottom: 0; }
+td:first-child { font-weight: 500; }
+td code { white-space: normal; }
+.callout { border-left: 3px solid var(--accent); background: var(--accent-soft); padding: 10px 14px; border-radius: 0 6px 6px 0; margin: 14px 0; }
+.theme-toggle { margin-top: 20px; background: var(--surface-2); color: var(--muted); border: 1px solid var(--border); border-radius: 6px; font: inherit; font-size: 12.5px; padding: 5px 10px; cursor: pointer; }
+footer { color: var(--muted); font-size: 12.5px; margin-top: 56px; border-top: 1px solid var(--border); padding-top: 16px; }
+@media (max-width: 860px) {
+  .layout { grid-template-columns: 1fr; gap: 0; padding: 0 16px; }
+  nav.toc { position: static; max-height: none; padding: 20px 0 0; }
+  nav.toc ol { display: flex; flex-wrap: wrap; gap: 6px; border: 0; }
+  nav.toc li a { border: 1px solid var(--border); border-radius: 999px; padding: 3px 10px; margin: 0; font-size: 12.5px; }
+  h1 { font-size: 26px; }
+}
+</style>
+</head>
+<body>
+<div class="layout">
+<nav class="toc" aria-label="Contents">
+  <div class="brand">Simple Loot Council</div>
+  <div class="ver">Feature guide · beta</div>
+  <ol>
+    <li><a href="#getting-started">Getting started</a></li>
+    <li><a href="#how-a-run-works">How a loot run works</a></li>
+    <li><a href="#raiders">For raiders</a></li>
+    <li><a href="#council">For the council</a></li>
+    <li><a href="#loot-master">For the loot master</a></li>
+    <li><a href="#council-setup">Council setup</a></li>
+    <li><a href="#history">History, raid team and imports</a></li>
+    <li><a href="#settings">Settings</a></li>
+    <li><a href="#commands">Slash command reference</a></li>
+    <li><a href="#reliability">Reliability</a></li>
+    <li><a href="#testing">Testing and reporting bugs</a></li>
+  </ol>
+  <button class="theme-toggle" type="button" id="theme-toggle">Toggle light / dark</button>
+</nav>
+
+<main>
+<header class="hero">
+  <h1>Simple Loot Council — Feature Guide</h1>
+  <div class="byline">Sep 25, 2026 · Laxx</div>
+</header>
+
+<p class="lead">Simple Loot Council (SLC) runs loot council voting for WoW retail 12.1.0 (Midnight), synced live across every raider's client. Retail has no master looter, so the council votes on items sitting in a raider's bags during the 2-hour trade window; the loot master awards, and the holder trades the item across.</p>
+<p><span class="badge">Beta</span> SLC is in <strong>beta</strong> as of 0.40.0. Every participant needs the addon; players without it still show up in the council table, they just never answer.</p>
+
+<h2 id="getting-started">Getting started</h2>
+<ol class="steps">
+  <li>Install it. <strong>With WowUp:</strong> Get Addons → <strong>Install from URL</strong> → paste <a href="https://github.com/SimpleLootCouncil/SimpleLootCouncil-Beta"><code>https://github.com/SimpleLootCouncil/SimpleLootCouncil-Beta</code></a>. WowUp keeps it updated. <strong>By hand:</strong> download the zip from the <a href="https://github.com/SimpleLootCouncil/SimpleLootCouncil-Beta/releases/latest">latest release</a> and unzip the <code>SimpleLootCouncil</code> folder into <code>World of Warcraft\_retail_\Interface\AddOns</code>.</li>
+  <li><code>/reload</code> in game. No client restart is needed, even for a first install.</li>
+  <li>Type <code>/slc</code> to open settings. <code>/glc</code> works as an alias for every command.</li>
+  <li>The <strong>group leader</strong> runs loot by default. Hand it to someone else with <code>/slc lootmaster Name-Realm</code>.</li>
+  <li>Add your council: <code>/slc council add Name-Realm</code>, or tick guild ranks under <strong>Council by guild rank</strong> in settings.</li>
+  <li>Try it solo first: <code>/slc test 6</code> opens a simulated run with six items so you can see every window.</li>
+</ol>
+<div class="callout">If WowUp says <strong>Addon Installation Failed</strong>, go to Options → Addons and clear the <strong>GitHub Personal Access Token</strong> field, then try again.</div>
+<p>No library dependencies. Optional integrations: <strong>WowUtils</strong> (wishlist and sim columns), <strong>SimulationCraft</strong> (profile export), <strong>RCLootCouncil</strong> / <strong>Loothing</strong> (history import). Disable RCLootCouncil's own looting if you run the SLC funnel - the two conflict.</p>
+
+<h2 id="how-a-run-works">How a loot run works</h2>
+<p>A run goes from the boss kill to a completed trade in seven steps, and every step is shared live with the group.</p>
+<ol class="steps">
+  <li><strong>Opt in.</strong> On entering a raid, the loot master is asked "Use Simple Loot Council for this raid?". Raiders are then asked whether to take part. Nobody is asked anything until the loot master says yes.</li>
+  <li><strong>Collect.</strong> With the optional group-loot funnel on, the loot master rolls Need and participating raiders pass, so loot lands in one pair of bags. Without it, raiders keep what they win and the council still votes on it.</li>
+  <li><strong>Stage.</strong> The loot master queues items privately in the <strong>Loot Queue</strong> (<code>/slc queue</code>), from their own bags or, if enabled, council members' bags. Staging opens nothing on anyone else's screen.</li>
+  <li><strong>Start.</strong> <code>Start run</code> sends the items to the group. Every raider gets the <strong>Loot Response</strong> window; the council gets the <strong>Loot Council</strong> table. Items can be added to a run in progress.</li>
+  <li><strong>Respond.</strong> Raiders pick a response (Mainspec, Offspec, Transmog by default, all configurable), add an optional note, or pass. Unusable items can auto-pass.</li>
+  <li><strong>Vote and award.</strong> The council votes; the loot master awards. Awards can go to a player or "for a reason" (disenchant, guild bank, free).</li>
+  <li><strong>Trade.</strong> Whoever holds the item sees it in <strong>Loot to Trade</strong>. Opening a trade with the winner fills the window automatically; you press Trade. The award is marked <strong>delivered</strong> only once the item has actually changed hands.</li>
+</ol>
+<p>The boss each item dropped from is recorded automatically, from the kill or from the Adventure Guide. Addon messages are blocked during boss encounters and Mythic+, so loot seen mid-fight is queued and sent when the pull ends; normal combat is fine.</p>
+
+<h2 id="raiders">For raiders</h2>
+<p>A raider answers each item in one window and never needs a command.</p>
+<div class="table-wrap"><table>
+<thead><tr><th>Feature</th><th>What it does</th><th>Commands</th></tr></thead>
+<tbody>
+<tr><td>Loot Response window</td><td>One card per item, with its item level, your equipped comparison and the response buttons. Pass is always there.</td><td><code>/slc response</code> (<code>/slc r</code>) reopens it</td></tr>
+<tr><td>Notes</td><td>Add up to 64 characters per item, with or without a response. The council sees <code>[+]</code> and reads the note on hover. A half-typed note survives repaints and reloads.</td><td>-</td></tr>
+<tr><td>Session panel</td><td>A compact overview of your own answers, rolls and awards for the run.</td><td><code>/slc session</code> (<code>/slc sess</code>)</td></tr>
+<tr><td>Rolls</td><td>When the council asks, a Roll button appears on the card. Your roll is read from chat by your own client and the loot master's.</td><td><code>/roll</code> works too</td></tr>
+<tr><td>Auto-pass</td><td>Passes for you on items with a definite class or armour restriction, never on a guess. It never overrides an answer you already gave. The note reads <code>Automatic pass: wrong armour type.</code></td><td>Settings &gt; Loot handling</td></tr>
+<tr><td>Transmog exception</td><td>Optional: never auto-pass on an item that would teach you a new appearance.</td><td>Settings &gt; Loot handling</td></tr>
+<tr><td>Whisper fallback</td><td>If your addon is broken, whisper the loot master: <code>1 mainspec great upgrade</code>. Button names, first words and custom keywords all match, in any case.</td><td><code>/slc whisper</code> shows the guide</td></tr>
+<tr><td>Group-loot funnel</td><td>Opt-in. While the loot master is collecting, your client passes on group loot so it lands with them. You are warned in chat whenever it is active.</td><td><code>/slc funnel</code> toggles it</td></tr>
+<tr><td>Auto-join</td><td>Skip the "take part?" question in groups that use SLC. You are still told in chat.</td><td>Settings &gt; Loot handling</td></tr>
+<tr><td>Bonus rolls</td><td>Coin results you win are reported to the loot master and shown as a <code>coined</code> tag beside your name on that item.</td><td><code>/slc coins</code></td></tr>
+<tr><td>Windows come back</td><td>The response window reopens itself after a loading screen, fear or mind control if the game closed it. Closing it yourself keeps it closed.</td><td>-</td></tr>
+</tbody></table></div>
+
+<h2 id="council">For the council</h2>
+<p>The <strong>Loot Council</strong> table shows every candidate for every item, and each council member's votes reach everyone within a second. Reopen it any time with <code>/slc vote</code> (<code>/slc v</code>).</p>
+<div class="table-wrap"><table>
+<thead><tr><th>Column / feature</th><th>What it shows</th></tr></thead>
+<tbody>
+<tr><td>Item rail</td><td>Each item with its state: OPEN, AWARDED, MISSING, OWED, REMOVED, plus boss, difficulty and upgrade track</td></tr>
+<tr><td>Name</td><td>Class-coloured candidate, spec, item level, and a <code>coined</code> tag if they bonus-rolled this item</td></tr>
+<tr><td>Response</td><td>Their answer in its button colour, or Waiting, Pass, Auto-pass</td></tr>
+<tr><td>Upgrade</td><td>Item-level change against what they have equipped, and tier-set progress (<code>3/4 set</code>, <code>+2set</code>, <code>+4set</code>)</td></tr>
+<tr><td>Wishlist / Sim</td><td>From WowUtils, when installed: is it on their list, BiS, and the simulated DPS gain</td></tr>
+<tr><td>Note</td><td><code>[+]</code> when they wrote one; hover to read it</td></tr>
+<tr><td>Roll</td><td>Their roll, or <code>assign</code> for a generated one</td></tr>
+<tr><td>Votes</td><td>Vote count, with Vote / Unvote buttons</td></tr>
+<tr><td>Compact / Expand</td><td>Toggle a denser layout for large raids</td></tr>
+</tbody></table></div>
+<p><strong>Hover a candidate</strong> for the council tooltip: their most recent loot, who else has won this item, attendance (nights this season), alt/main link, guild note and officer note (if you can see it), and their equipped item with sockets and average item level.</p>
+<p><strong>Voting rules</strong> are shared group-wide so a vote means the same thing on every screen:</p>
+<ul class="plain">
+  <li>Council may vote for themselves (on by default)</li>
+  <li>Allow voting for several candidates per item (off)</li>
+  <li>Hide vote counts until you have voted, to stop bandwagoning (off)</li>
+</ul>
+<p><strong>Rolls:</strong> right-click a row or item to ask one player, everyone on a response, or the whole raid to roll; or generate rolls instantly. <code>/slc roll ask</code>, <code>/slc roll random</code>, <code>/slc roll clear</code> do the same for every unawarded item.</p>
+<p><strong>Start requests:</strong> if the loot master allows it, council members can propose a run from their own queue; the loot master approves or declines.</p>
+
+<h2 id="loot-master">For the loot master</h2>
+<p>The loot master stages, starts, awards and ends runs; SLC tracks every item until it is delivered.</p>
+<div class="table-wrap"><table>
+<thead><tr><th>Feature</th><th>What it does</th><th>Commands</th></tr></thead>
+<tbody>
+<tr><td>Loot Queue</td><td>Private staging window. A side panel lists your tradeable items (newest first); click one to queue it, or add all.</td><td><code>/slc queue</code> (<code>/slc q</code>), <code>/slc additem &lt;link&gt;</code>, <code>/slc bags add &lt;n&gt;|all</code></td></tr>
+<tr><td>Start / end a run</td><td>Start sends the queue to the group. End keeps the records for re-award; Clear discards staged items (refused mid-run).</td><td><code>/slc start</code>, <code>/slc end</code>, <code>/slc clear</code></td></tr>
+<tr><td>Add mid-run</td><td>Items can join a run already in progress; loot rarely arrives in one batch.</td><td>Loot Queue or <code>/slc additem</code></td></tr>
+<tr><td>Award</td><td>One click on a candidate's row, with a confirmation. Re-award or undo at any time; undo strikes it from history for everyone.</td><td>Right-click a row</td></tr>
+<tr><td>Award for a reason</td><td>Disenchant, Guild bank or Free. Kept out of that player's win count; Free is not recorded at all.</td><td>Right-click &gt; Award for</td></tr>
+<tr><td>BoE routing</td><td>Name one player and one reason for Bind-on-Equip items. Their row shows <code>route -&gt;</code> and the Award button is pre-filled. It never awards by itself.</td><td>Settings &gt; Loot handling</td></tr>
+<tr><td>Remove / restore</td><td>Pull an item out of a run and put it back later.</td><td>Right-click the item</td></tr>
+<tr><td>Held-item checks</td><td>Items that were equipped, sold, or passed their trade window are flagged MISSING and cannot be awarded. An item still owed from an earlier award shows OWED.</td><td>-</td></tr>
+<tr><td>Loot to Trade</td><td>Everything you owe, grouped by player and trade range. Open a trade and the items are filled in; you press Trade. Wrong recipients, equipped or vanished items are flagged red and reported to the loot master.</td><td><code>/slc trades</code>, <code>/slc trade [name]</code>, <code>/slc held</code></td></tr>
+<tr><td>Announcements</td><td>Awards, completed trades and roll requests posted to raid/party chat, by the loot master only. Each can be switched off.</td><td>Settings &gt; Announcements</td></tr>
+<tr><td>Session timer</td><td>Optional countdown on a run. Display only: it never closes the run or rejects a late answer.</td><td>Settings &gt; Session</td></tr>
+<tr><td>Active / LIVE tags</td><td>In <code>/slc</code>: click Active to turn SLC on or off for the group; click LIVE to open the council window, right-click to end the run.</td><td><code>/slc on</code>, <code>/slc off</code></td></tr>
+<tr><td>SimulationCraft</td><td>With SimC installed, <code>/simc</code> includes the run's items as a gear block to paste into Raidbots.</td><td><code>/simc</code></td></tr>
+</tbody></table></div>
+
+<h2 id="council-setup">Council setup</h2>
+<p>The council is a list of players plus any guild ranks you empower, and the group leader's settings are shared with everyone automatically.</p>
+<div class="table-wrap"><table>
+<thead><tr><th>Feature</th><th>What it does</th><th>Commands</th></tr></thead>
+<tbody>
+<tr><td>Council members</td><td>Add or remove by Name-Realm. Absent members show as pending (greyed) until they join; members are kept by character ID, so renames and transfers survive.</td><td><code>/slc council</code>, <code>/slc council add|remove &lt;Name-Realm&gt;</code></td></tr>
+<tr><td>Council by guild rank</td><td>Tick ranks in settings; everyone at that rank votes, and promotions or demotions apply automatically. Listed after named members.</td><td>Settings &gt; Loot Council</td></tr>
+<tr><td>Loot master delegation</td><td>The leader hands loot to someone else. It reverts to the leader whenever the delegate leaves the group.</td><td><code>/slc lootmaster &lt;Name-Realm&gt;</code>, <code>/slc lootmaster clear</code> (<code>/slc ml</code>)</td></tr>
+<tr><td>Start requests</td><td>Let council members propose a run for approval, or start runs themselves without approval. Both off by default.</td><td>Settings &gt; Voting</td></tr>
+<tr><td>Council bags</td><td>Show each council member's tradeable loot in the Loot Queue under their name, so items they hold can be staged. Off by default.</td><td>Settings &gt; Voting</td></tr>
+<tr><td>Response buttons</td><td>Rename, recolour, add, delete or reorder the buttons raiders see, and add whisper keywords (e.g. <code>ms</code>).</td><td>Settings &gt; Response buttons</td></tr>
+<tr><td>Alts</td><td>Link an alt to its main so the council sees the whole history. Realm spelling is forgiving.</td><td><code>/slc alt &lt;Alt-Realm&gt; &lt;Main-Realm&gt;</code>, <code>/slc alt remove &lt;Alt-Realm&gt;</code>, Settings &gt; Alts</td></tr>
+<tr><td>Version check</td><td>See which build everyone runs; you are warned in chat if someone is on a different version.</td><td><code>/slc version</code> (<code>/slc ver</code>)</td></tr>
+<tr><td>Guild-group gate</td><td>The funnel only acts in guild groups by default.</td><td><code>/slc guild</code></td></tr>
+</tbody></table></div>
+
+<h2 id="history">History, raid team and imports</h2>
+<p>Every award is recorded, shared with the group, and browsable by item or by raider.</p>
+<div class="table-wrap"><table>
+<thead><tr><th>Feature</th><th>What it does</th><th>Commands</th></tr></thead>
+<tbody>
+<tr><td>Loot History browser</td><td>Every award with date, item, winner, response, boss, instance, votes and delivered state. Search by name, item, boss or date; filter by time (30 days to all time), source, mine only or raid team.</td><td><code>/slc history</code> (<code>/slc h</code>)</td></tr>
+<tr><td>Council snapshot</td><td>Hover an award to see the council as it stood: every candidate's answer, note, roll and votes. Hold Shift for more than eight. For settling disputes.</td><td>Hover a row</td></tr>
+<tr><td>Edit locally</td><td>Right-click a row to fix the winner, response or reason, or delete it. Edits are marked as local.</td><td>Right-click a row</td></tr>
+<tr><td>Shared history</td><td>Awards broadcast so every raider keeps an auditable copy.</td><td>Settings &gt; Data &amp; history</td></tr>
+<tr><td>Raid Team Loot</td><td>The same history pivoted by raider for the guild ranks you mark as your raid team. Expand a raider to see what they won; sort by loot, latest win, attendance, rank or name; this season or all time. Bank and disenchant awards are listed, never counted.</td><td><code>/slc team</code> (<code>/slc t</code>), <code>/slc team season &lt;date&gt;|clear</code></td></tr>
+<tr><td>Attendance</td><td>While you run loot, who was present at the end of each pull is recorded and shared. Shown as nights attended on hover and in Raid Team.</td><td><code>/slc attendance [name]</code> (<code>/slc att</code>), <code>/slc attendance nights</code></td></tr>
+<tr><td>CSV export</td><td>Copyable export, comma or semicolon separated (semicolon suits European Excel).</td><td><code>/slc csv [slc] [comma|semicolon]</code></td></tr>
+<tr><td>Import other addons</td><td>Pull award history from <strong>RCLootCouncil</strong> or <strong>Loothing</strong> saved data on this client. Imported rows are kept separate and labelled.</td><td>History &gt; Import Other History, <code>/slc import [addon]</code></td></tr>
+<tr><td>Import CSV</td><td>Paste a CSV export from RCLootCouncil, Loothing or SLC, including someone else's database. Duplicates are skipped.</td><td>History &gt; Import CSV</td></tr>
+<tr><td>Retention</td><td>Local history is pruned after 180 days by default.</td><td>Settings &gt; Data &amp; history</td></tr>
+</tbody></table></div>
+
+<h2 id="settings">Settings</h2>
+<p>Every option lives in the <code>/slc</code> window. Settings marked <strong>shared</strong> come from the loot master and apply to the whole group.</p>
+<div class="table-wrap"><table>
+<thead><tr><th>Section</th><th>Setting</th><th>Default</th></tr></thead>
+<tbody>
+<tr><td>Voting</td><td>Council may vote for themselves (shared)</td><td>On</td></tr>
+<tr><td>Voting</td><td>Allow voting for several candidates (shared)</td><td>Off</td></tr>
+<tr><td>Voting</td><td>Hide vote counts until you have voted (shared)</td><td>Off</td></tr>
+<tr><td>Voting</td><td>Council may request a run start (shared)</td><td>Off</td></tr>
+<tr><td>Voting</td><td>Council members may start runs themselves (shared)</td><td>Off</td></tr>
+<tr><td>Voting</td><td>View loot in council members' bags (shared)</td><td>Off</td></tr>
+<tr><td>Loot handling</td><td>Auto-pass on unusable items</td><td>On</td></tr>
+<tr><td>Loot handling</td><td>Don't auto-pass on items you can gain an appearance from</td><td>Off</td></tr>
+<tr><td>Loot handling</td><td>Group-loot funnel</td><td>Off</td></tr>
+<tr><td>Loot handling</td><td>Funnel only in guild groups</td><td>On</td></tr>
+<tr><td>Loot handling</td><td>Use SLC in groups (not just raids)</td><td>Off</td></tr>
+<tr><td>Loot handling</td><td>Route BoE items to (player + reason)</td><td>Unset</td></tr>
+<tr><td>Loot handling</td><td>Automatically join SLC sessions in groups you join</td><td>Off</td></tr>
+<tr><td>Session</td><td>Allow whispered loot responses</td><td>On</td></tr>
+<tr><td>Session</td><td>Show the council hover panel</td><td>On</td></tr>
+<tr><td>Session</td><td>Show the session frame</td><td>On</td></tr>
+<tr><td>Session</td><td>Session timer (10 s to 1 h)</td><td>Off, 120 s</td></tr>
+<tr><td>Announcements</td><td>Announce awards / trades / roll requests in raid chat</td><td>On</td></tr>
+<tr><td>Response buttons</td><td>Names, colours, order, whisper keywords</td><td>Mainspec, Offspec, Transmog</td></tr>
+<tr><td>Loot Council</td><td>Named members and council guild ranks</td><td>Empty</td></tr>
+<tr><td>Data &amp; history</td><td>Record award history; share it with the group; record attendance</td><td>On</td></tr>
+<tr><td>Diagnostics</td><td>Log to chat</td><td>Off</td></tr>
+<tr><td>Alts</td><td>Alt-to-main links</td><td>Empty</td></tr>
+</tbody></table></div>
+
+<h2 id="commands">Slash command reference</h2>
+<p>Every command works as <code>/slc</code> or <code>/glc</code>; <code>/slc help</code> prints this list in game.</p>
+<div class="table-wrap"><table>
+<thead><tr><th>Command</th><th>Who</th><th>What it does</th></tr></thead>
+<tbody>
+<tr><td><code>/slc</code></td><td>Anyone</td><td>Open settings</td></tr>
+<tr><td><code>/slc response</code> (<code>r</code>)</td><td>Anyone</td><td>Reopen your loot response window</td></tr>
+<tr><td><code>/slc vote</code> (<code>v</code>)</td><td>Council</td><td>Reopen the council window</td></tr>
+<tr><td><code>/slc session</code> (<code>sess</code>)</td><td>Anyone</td><td>Your own view of the current run</td></tr>
+<tr><td><code>/slc queue</code> (<code>q</code>)</td><td>Loot master</td><td>Staging window with the bags panel</td></tr>
+<tr><td><code>/slc additem &lt;link&gt;</code></td><td>Loot master</td><td>Queue an item (shift-click it in)</td></tr>
+<tr><td><code>/slc bags [add &lt;n&gt;|add all]</code></td><td>Loot master</td><td>List tradeable items, or queue them</td></tr>
+<tr><td><code>/slc start</code></td><td>Loot master</td><td>Start a run on the queued items</td></tr>
+<tr><td><code>/slc end</code></td><td>Loot master</td><td>End the run, keeping items for re-award</td></tr>
+<tr><td><code>/slc clear</code></td><td>Loot master</td><td>Discard staged items (refused during a run)</td></tr>
+<tr><td><code>/slc show</code></td><td>Anyone</td><td>Print the current run state</td></tr>
+<tr><td><code>/slc roll [ask|random|clear]</code></td><td>Loot master</td><td>Rolls on every unawarded item</td></tr>
+<tr><td><code>/slc on</code> / <code>/slc off</code></td><td>Loot master</td><td>Use SLC for this group, or stop</td></tr>
+<tr><td><code>/slc funnel</code></td><td>Anyone</td><td>Toggle your group-loot funnel</td></tr>
+<tr><td><code>/slc lootmaster [&lt;name&gt;|clear]</code> (<code>ml</code>)</td><td>Leader</td><td>Delegate loot, or hand it back</td></tr>
+<tr><td><code>/slc council [add|remove &lt;name&gt;]</code></td><td>Leader</td><td>Manage the council</td></tr>
+<tr><td><code>/slc alt [&lt;alt&gt; &lt;main&gt;|remove &lt;alt&gt;]</code></td><td>Anyone</td><td>Link an alt's history to its main</td></tr>
+<tr><td><code>/slc trades</code></td><td>Holder</td><td>The Loot to Trade window</td></tr>
+<tr><td><code>/slc trade [name]</code></td><td>Holder</td><td>Open a trade with someone you owe</td></tr>
+<tr><td><code>/slc held</code></td><td>Holder</td><td>List what you owe or are holding</td></tr>
+<tr><td><code>/slc whisper [text]</code> (<code>w</code>)</td><td>Anyone</td><td>Show the whisper guide, or test what a whisper would do</td></tr>
+<tr><td><code>/slc history</code> (<code>h</code>)</td><td>Anyone</td><td>Loot history browser (<code>history text</code> prints it)</td></tr>
+<tr><td><code>/slc csv [slc] [comma|semicolon]</code></td><td>Anyone</td><td>Export history as CSV; <code>slc</code> omits imported rows</td></tr>
+<tr><td><code>/slc import [addon]</code></td><td>Anyone</td><td>Import RCLootCouncil or Loothing history</td></tr>
+<tr><td><code>/slc team</code> (<code>t</code>)</td><td>Anyone</td><td>Raid Team Loot view</td></tr>
+<tr><td><code>/slc team season [date|clear]</code></td><td>Anyone</td><td>Set what counts as this season</td></tr>
+<tr><td><code>/slc attendance [name]</code> (<code>att</code>)</td><td>Anyone</td><td>Nights and pulls attended; <code>nights</code> lists raid nights</td></tr>
+<tr><td><code>/slc boss</code></td><td>Anyone</td><td>Current boss and the encounter log</td></tr>
+<tr><td><code>/slc coins</code></td><td>Anyone</td><td>Recent bonus-roll results</td></tr>
+<tr><td><code>/slc item &lt;link&gt;</code></td><td>Anyone</td><td>Why the funnel does or does not take an item</td></tr>
+<tr><td><code>/slc set</code></td><td>Anyone</td><td>Equipped tier-set facts</td></tr>
+<tr><td><code>/slc guild</code></td><td>Anyone</td><td>The guild-group gate check</td></tr>
+<tr><td><code>/slc version</code> (<code>ver</code>)</td><td>Anyone</td><td>Who runs which build</td></tr>
+<tr><td><code>/slc status</code></td><td>Anyone</td><td>Restrictions, queue depth, leader</td></tr>
+<tr><td><code>/slc test [&lt;count&gt;|&lt;link&gt; [from [heroic] &lt;boss&gt;], ...]</code></td><td>Anyone</td><td>Simulated run; count 1-N from a classic raid pool, default 3</td></tr>
+<tr><td><code>/slc testcoin [Name-Realm] [item]</code></td><td>Anyone</td><td>Fake a coin result on a test run</td></tr>
+<tr><td><code>/slc ping [bytes]</code></td><td>Anyone</td><td>Comms round-trip test</td></tr>
+<tr><td><code>/slc log</code> / <code>/slc log history</code></td><td>Anyone</td><td>Diagnostic log, copyable</td></tr>
+<tr><td><code>/slc dump</code></td><td>Anyone</td><td>Saved variables, copyable</td></tr>
+<tr><td><code>/slc debug</code></td><td>Anyone</td><td>Echo the log to chat</td></tr>
+<tr><td><code>/slc pseudo [on|off]</code></td><td>Anyone</td><td>Translation test mode (reloads)</td></tr>
+<tr><td><code>/slc taint</code></td><td>Anyone</td><td>Blocked-action counts</td></tr>
+</tbody></table></div>
+
+<h2 id="reliability">Reliability</h2>
+<p>A run survives reloads, disconnects and loading screens on any client, including the loot master's.</p>
+<ul class="plain">
+  <li><strong>Reload recovery.</strong> A raider, council member or loot master who <code>/reload</code>s mid-run gets the run back from the group within seconds: responses, notes, votes, rolls and coins intact. A delegated loot master recovers too.</li>
+  <li><strong>Nothing owed is forgotten.</strong> The trade ledger is saved, so a reload never loses who you owe what.</li>
+  <li><strong>Delivery is checked against your bags</strong>, not assumed. An item that was equipped, sold, or traded to the wrong player is flagged, and the loot master is told.</li>
+  <li><strong>Loading screens and crowd control.</strong> The game closes addon windows on every zone change, fear or mind control; SLC reopens the ones you did not close yourself.</li>
+  <li><strong>Boss encounters and Mythic+.</strong> Blizzard blocks addon messages there. SLC queues outgoing messages in order and sends them when the block lifts.</li>
+  <li><strong>Version warnings.</strong> You are told in chat if someone in the group runs a different build.</li>
+  <li><strong>Every string is translatable.</strong> The addon ships in English; translators can work from <code>Locale/enUS.lua</code>.</li>
+</ul>
+
+<h2 id="testing">Testing and reporting bugs</h2>
+<p>Most of SLC can be tried solo; a real bug report needs the log from every client involved.</p>
+<p><strong>Solo checks</strong></p>
+<ul class="plain">
+  <li><code>/slc test 6</code> - a simulated run with six classic-raid items. Open every window, respond, vote, award.</li>
+  <li><code>/slc test [item link] from heroic &lt;boss&gt;</code> - test a specific item, attributed to a boss and difficulty.</li>
+  <li><code>/slc testcoin 2</code> - fake a bonus roll on item 2 to see the <code>coined</code> tag. No coin is spent and nothing reaches history.</li>
+  <li><code>/slc ping</code> - checks the whole message path, round trip.</li>
+  <li><code>/slc history</code>, <code>/slc team</code>, <code>/slc queue</code>, <code>/slc trades</code> - browse each window.</li>
+  <li>Test awards from <code>/slc test</code> never reach your real history.</li>
+</ul>
+<p><strong>With a friend:</strong> start a test run, then <code>/reload</code> one client mid-run and check that everything comes back.</p>
+<p><strong>Before testing,</strong> run <code>/console scriptErrors 1</code> so Lua errors show on screen. BugSack and BugGrabber help too.</p>
+<p><strong>When something goes wrong, send:</strong></p>
+<ol class="steps">
+  <li><code>/slc log</code> from every affected player, copied out of the window.</li>
+  <li><code>/slc dump</code> from the loot master.</li>
+  <li>What you clicked, and what you expected to happen.</li>
+</ol>
+<p>The log is timestamped and survives reloads, so comparing the loot master's with a raider's usually shows which message went missing. After an update, <code>/reload</code> twice before reading the log: the first reload still shows the old build's state.</p>
+
+<footer>Simple Loot Council © 2026 Laxx. All rights reserved. · <a href="https://github.com/SimpleLootCouncil/SimpleLootCouncil-Beta">Beta downloads</a></footer>
+</main>
+</div>
+<script>
+(function () {
+  var root = document.documentElement, key = "slc-guide-theme";
+  try { var saved = localStorage.getItem(key); if (saved) root.setAttribute("data-theme", saved); } catch (e) {}
+  document.getElementById("theme-toggle").addEventListener("click", function () {
+    var dark = root.getAttribute("data-theme") ? root.getAttribute("data-theme") === "dark"
+      : window.matchMedia("(prefers-color-scheme: dark)").matches;
+    var next = dark ? "light" : "dark";
+    root.setAttribute("data-theme", next);
+    try { localStorage.setItem(key, next); } catch (e) {}
+  });
+  var links = [].slice.call(document.querySelectorAll("nav.toc a"));
+  var map = {}; links.forEach(function (a) { map[a.getAttribute("href").slice(1)] = a; });
+  var obs = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) {
+      if (e.isIntersecting) {
+        links.forEach(function (a) { a.classList.remove("active"); });
+        var a = map[e.target.id]; if (a) a.classList.add("active");
+      }
+    });
+  }, { rootMargin: "0px 0px -75% 0px" });
+  document.querySelectorAll("main h2[id]").forEach(function (h) { obs.observe(h); });
+})();
+</script>
+</body>
+</html>
