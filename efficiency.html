@@ -1,0 +1,500 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Simple Loot Council Efficiency Scorecard</title>
+<meta name="description" content="How much cheaper Simple Loot Council became to run: the comms and efficiency rework, and the run-recovery cache, measured against the addon before them.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one reading column in two acts. Act one sets the rework against the
+   addon before it; act two sets the run-recovery cache against both. */
+:root {
+  --bg: #f3f6f9;
+  --surface: #ffffff;
+  --ink: #15202b;
+  --ink-2: #46525f;
+  --ink-3: #6f7b88;
+  --line: #d9e0e8;
+  --accent: #2b67c9;
+  --accent-soft: #e2ecfa;
+  --before: #a3acb6;
+  --rework: #86a9dd;
+  --cache: #2b67c9;
+  --good: #1f7a4d;
+  --font-display: "Barlow Condensed", "Arial Narrow", "Roboto Condensed", sans-serif;
+  --font-body: "Barlow", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0e1319; --surface: #151c24; --ink: #e5eaf0; --ink-2: #b0bac5; --ink-3: #8691a0;
+    --line: #26303c; --accent: #6fa3f2; --accent-soft: #1b2a40;
+    --before: #5d6773; --rework: #4a6f9f; --cache: #6fa3f2; --good: #5fc28e;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0e1319; --surface: #151c24; --ink: #e5eaf0; --ink-2: #b0bac5; --ink-3: #8691a0;
+  --line: #26303c; --accent: #6fa3f2; --accent-soft: #1b2a40;
+  --before: #5d6773; --rework: #4a6f9f; --cache: #6fa3f2; --good: #5fc28e;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 16px; line-height: 1.55; }
+.wrap { max-width: 1060px; margin: 0 auto; padding-inline: 20px; padding-block: 40px 64px; display: grid; gap: 60px; }
+h1, h2, h3 { font-family: var(--font-display); font-weight: 700; letter-spacing: 0.01em; margin: 0; text-wrap: balance; line-height: 1.1; }
+h1 { font-size: clamp(34px, 5vw, 52px); }
+h2 { font-size: 32px; }
+h3 { font-size: 20px; }
+p { margin: 0; }
+.prose { max-width: 68ch; color: var(--ink-2); }
+.eyebrow { font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.04em; color: var(--ink-3); text-transform: uppercase; }
+.mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+code { font-family: var(--font-mono); font-size: 0.9em; background: var(--accent-soft); color: var(--ink); padding: 1px 5px; border-radius: 4px; }
+section, header { display: grid; gap: 18px; }
+.act { display: grid; gap: 28px; }
+.act-head { display: grid; gap: 10px; border-top: 3px solid var(--ink); padding-top: 18px; }
+.act-head.cache { border-top-color: var(--cache); }
+.act-head .eyebrow { color: var(--ink-2); }
+
+.thesis { font-family: var(--font-display); font-weight: 600; font-size: clamp(22px, 3vw, 30px); line-height: 1.22; color: var(--ink); max-width: 34ch; }
+.thesis b { color: var(--accent); font-weight: 700; }
+
+.states { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.state { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 16px; display: grid; gap: 6px; align-content: start; }
+.state .tag { display: flex; align-items: center; gap: 8px; font-family: var(--font-display); font-weight: 700; font-size: 19px; }
+.swatch { width: 12px; height: 12px; border-radius: 3px; flex: none; display: inline-block; }
+.sw-before { background: var(--before); } .sw-rework { background: var(--rework); } .sw-cache { background: var(--cache); }
+.state p { font-size: 14px; color: var(--ink-2); }
+.state .ver { font-family: var(--font-mono); font-size: 13px; color: var(--ink); }
+
+.tiles { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+.tile { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 18px 16px; display: grid; gap: 10px; align-content: start; }
+.tile .label { font-size: 14px; color: var(--ink-2); font-weight: 500; }
+.pair { display: grid; gap: 4px; }
+.pair div { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; font-size: 13px; color: var(--ink-3); }
+.pair .v { font-family: var(--font-mono); font-variant-numeric: tabular-nums; color: var(--ink-2); font-size: 14px; }
+.pair .to .v { font-family: var(--font-display); font-weight: 700; font-size: 30px; color: var(--accent); line-height: 1; }
+.tile .gain { font-size: 13px; color: var(--good); font-weight: 600; }
+.tile .also { font-size: 12.5px; color: var(--ink-3); }
+
+.chart-card { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 20px; display: grid; gap: 12px; min-width: 0; }
+.chart-card .sub { font-size: 14px; color: var(--ink-3); }
+.charts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+svg.bars { width: 100%; height: auto; display: block; }
+svg.bars .tick line { stroke: var(--line); stroke-width: 1; }
+svg.bars .tick text, svg.bars .rowlabel, svg.bars .val { font-family: var(--font-mono); font-size: 11px; fill: var(--ink-3); }
+svg.bars .group { font-family: var(--font-body); font-size: 13px; font-weight: 600; fill: var(--ink); }
+svg.bars .val { fill: var(--ink-2); }
+svg.bars .val.cache { fill: var(--accent); font-weight: 500; }
+svg.bars rect.before { fill: var(--before); } svg.bars rect.rework { fill: var(--rework); } svg.bars rect.cache { fill: var(--cache); }
+
+.table-wrap { overflow-x: auto; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; }
+table { border-collapse: collapse; width: 100%; min-width: 760px; font-size: 14px; }
+th, td { text-align: left; vertical-align: top; padding: 11px 14px; border-bottom: 1px solid var(--line); }
+thead th { font-family: var(--font-display); font-size: 16px; font-weight: 700; color: var(--ink); background: var(--bg); }
+thead th .swatch { margin-right: 6px; vertical-align: 1px; }
+tbody th { font-weight: 600; color: var(--ink); width: 27%; }
+tbody td { color: var(--ink-2); font-variant-numeric: tabular-nums; }
+tbody td.to { color: var(--ink); font-weight: 500; }
+tbody td.x { font-family: var(--font-mono); color: var(--good); font-weight: 500; white-space: nowrap; }
+tbody tr:last-child th, tbody tr:last-child td { border-bottom: 0; }
+.how { display: inline-block; margin-top: 4px; font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.03em; color: var(--ink-3); font-weight: 400; }
+tr.group-row th { background: var(--bg); font-family: var(--font-display); font-size: 15px; letter-spacing: 0.05em; text-transform: uppercase; color: var(--ink-3); padding-block: 8px; }
+
+.timeline { display: grid; border-left: 2px solid var(--line); margin-left: 6px; }
+.step { position: relative; padding: 0 0 18px 22px; display: grid; gap: 3px; }
+.step::before { content: ""; position: absolute; left: -7px; top: 6px; width: 12px; height: 12px; border-radius: 50%; background: var(--rework); border: 2px solid var(--bg); }
+.step.cache::before { background: var(--cache); }
+.step:last-child { padding-bottom: 0; }
+.step .ver { font-family: var(--font-mono); font-size: 13px; color: var(--ink-3); }
+.step h3 { font-size: 19px; }
+.step p { color: var(--ink-2); max-width: 72ch; font-size: 15px; }
+.step .effect { color: var(--good); font-size: 14px; font-weight: 600; }
+
+.two { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 18px 20px; display: grid; gap: 10px; align-content: start; }
+.panel ul { margin: 0; padding-left: 18px; display: grid; gap: 8px; color: var(--ink-2); font-size: 15px; }
+.foot { color: var(--ink-3); font-size: 13px; max-width: 82ch; display: grid; gap: 6px; }
+
+@media (max-width: 880px) {
+  .tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .charts, .two { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 560px) {
+  .wrap { padding-inline: 16px; gap: 48px; }
+  .states, .tiles { grid-template-columns: minmax(0, 1fr); }
+}
+</style>
+
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <p class="eyebrow"><a href="/" style="color:inherit">← Simple Loot Council Guide</a></p>
+    <p class="eyebrow">SimpleLootCouncil · 0.40.7 → 0.41.13 → 0.41.14 · 30 September 2026</p>
+    <h1>Efficiency Scorecard</h1>
+    <p class="thesis">The rework made each answer <b>140×</b> cheaper and cut a council member's reload from 291 addon messages to 124. The run-recovery cache then cut that reload to <b>2</b>.</p>
+    <p class="prose">Two changes are measured here against the addon as it stood before them. The Full Comms and Efficiency Rework ran from 0.40.8 to 0.41.13. The run-recovery cache is 0.41.14, measured on its own against the addon after the rework and against the addon before it. Every size was measured in the game client, and every CPU figure in the game. Times come from a model of the game's message limits unless marked as measured in game.</p>
+  </header>
+
+  <section aria-labelledby="states-h">
+    <h2 id="states-h">Three states of the addon</h2>
+    <div class="states">
+      <div class="state">
+        <div class="tag"><span class="swatch sw-before"></span>Before the rework</div>
+        <p class="ver">0.40.7 · 27 September</p>
+        <p>The last build before the rework. Its CPU costs were timed on 0.40.10–0.40.11, which only added measuring tools; its message sizes are 0.34.78's, the last measurement of the older text encoding.</p>
+      </div>
+      <div class="state">
+        <div class="tag"><span class="swatch sw-rework"></span>After the rework</div>
+        <p class="ver">0.41.13 · 29 September</p>
+        <p>A new message format with separate lanes, a redraw scheduler, batched answers, quieter recovery traffic, and a council member's run rebuilt in parts.</p>
+      </div>
+      <div class="state">
+        <div class="tag"><span class="swatch sw-cache"></span>With the run-recovery cache</div>
+        <p class="ver">0.41.14 · 30 September</p>
+        <p>Every player keeps a copy of the run at logout, and the loot master sends back only what changed while they were away.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================ Act one ============================ -->
+  <div class="act">
+    <div class="act-head">
+      <p class="eyebrow">Part one · 0.40.7 → 0.41.13</p>
+      <h2>The rework, against the addon before it</h2>
+      <p class="prose">The rework's target was the cost of a raid: CPU on every answer, the size and order of messages on the wire, and the traffic a reload caused. It changed every one of those.</p>
+    </div>
+
+    <div class="tiles">
+      <div class="tile">
+        <p class="label">CPU for one answer, 30 raiders × 12 items</p>
+        <div class="pair">
+          <div><span>Before</span><span class="v">5.60 ms</span></div>
+          <div class="to"><span>After</span><span class="v">0.04 ms</span></div>
+        </div>
+        <p class="gain">140× less</p>
+        <p class="also">It used to grow with the run: 7.06 ms at 40 × 16. It no longer does.</p>
+      </div>
+      <div class="tile">
+        <p class="label">Worst frame, 40 raiders × 16 items stress</p>
+        <div class="pair">
+          <div><span>Before</span><span class="v">514 ms</span></div>
+          <div class="to"><span>After</span><span class="v">6.3 ms</span></div>
+        </div>
+        <p class="gain">82× shorter</p>
+        <p class="also">Frames over 16.7 ms: 34 before, none after.</p>
+      </div>
+      <div class="tile">
+        <p class="label">A council member's reload, 30 × 24</p>
+        <div class="pair">
+          <div><span>Before</span><span class="v">~87 s</span></div>
+          <div class="to"><span>After</span><span class="v">~2.6 s</span></div>
+        </div>
+        <p class="gain">33× faster</p>
+        <p class="also">291 messages from the loot master before; 12 after, with 112 more from the raiders' own parts.</p>
+      </div>
+      <div class="tile">
+        <p class="label">The whole run on the wire, 30 × 24</p>
+        <div class="pair">
+          <div><span>Before</span><span class="v">97 messages</span></div>
+          <div class="to"><span>After</span><span class="v">66</span></div>
+        </div>
+        <p class="gain">A third fewer messages</p>
+        <p class="also">21,892 B to 16,493 B: a quarter fewer bytes.</p>
+      </div>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th scope="col">What was measured</th>
+            <th scope="col"><span class="swatch sw-before"></span>Before the rework</th>
+            <th scope="col"><span class="swatch sw-rework"></span>After the rework</th>
+            <th scope="col">Change</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="group-row"><th colspan="4">CPU and message time · <span class="mono">/slc stress</span>, measured in game</th></tr>
+          <tr><th>CPU per answer at 20 × 10, 30 × 12, 40 × 16</th><td>4.99 / 5.60 / 7.06 ms</td><td class="to">0.05 / 0.04 / 0.04 ms</td><td class="x">100–175×</td></tr>
+          <tr><th>SLC's total for the whole stress</th><td>1,667 / 3,023 / 6,427 ms</td><td class="to">46 / 56 / 81 ms</td><td class="x">36–79×</td></tr>
+          <tr><th>Worst frame</th><td>55.8 / 138.5 / 513.7 ms</td><td class="to">4.2 / 2.6 / 6.3 ms</td><td class="x">13–82×</td></tr>
+          <tr><th>Frames over 16.7 ms</th><td>3 / 7 / 34</td><td class="to">0 / 0 / 0</td><td class="x">none left</td></tr>
+          <tr><th>Council window repaints, 30 × 12 stress</th><td>About one per answer: 543 repaints, 1,423 ms</td><td class="to">135 paints, 32 ms</td><td class="x">44× less time</td></tr>
+          <tr class="group-row"><th colspan="4">The wire · sizes measured in the client</th></tr>
+          <tr><th>The whole run as one message, 30 × 24</th><td>21,892 B in 97 messages (older text encoding)</td><td class="to">16,493 B in 66 messages (raw bytes)</td><td class="x">−25% B, −32% messages</td></tr>
+          <tr><th>A raider's own copy of the run, 30 × 24</th><td>2,236 B in 10 messages</td><td class="to">1,685 B in 7 messages</td><td class="x">−30% messages</td></tr>
+          <tr><th>One raider's 12 answers</th><td>12 messages, past the game's burst of 10</td><td class="to">1 batch</td><td class="x">12 → 1</td></tr>
+          <tr><th>An award while bulk traffic is queued</th><td>Waits behind it: one queue for everything</td><td class="to">Its own lane; 95% sent within 1 s</td><td class="x">never blocked</td></tr>
+          <tr class="group-row"><th colspan="4">Reloads · 30 × 24, times modelled</th></tr>
+          <tr><th>A council member reloads</th><td>Each of its 3 asks answered with the whole run: 291 messages from the loot master; run back after ~87 s, queue busy ~4.7 min</td><td class="to">12 messages from the loot master, 112 from 28 raiders; ~2.6 s (0.8–4.5 s measured in game)</td><td class="x">33× faster</td></tr>
+          <tr><th>A raider reloads</th><td>10 messages from the loot master</td><td class="to">7 messages</td><td class="x">−30%</td></tr>
+          <tr><th>A wipe: 10 raiders and 3 council members reload</th><td>973 messages, ~16 min, in the queue awards also used</td><td class="to">106 messages, ~96 s, on the bulk lane; awards unaffected</td><td class="x">10× faster</td></tr>
+          <tr><th>Asks at every login</th><td>3 group asks from every client, handled by every other client, and 3 more on every roster change</td><td class="to">2 whispers to the loot master, then 1 group ask; none once it has said there is no run</td><td class="x">≈ 1 message</td></tr>
+          <tr><th>Notes sent again after a reload</th><td>One per answered item: 6 on a 6-item run</td><td class="to">Only a draft that differs from the run</td><td class="x">6 → 0</td></tr>
+          <tr class="group-row"><th colspan="4">Reliability</th></tr>
+          <tr><th>An award sent while a council member reloads</th><td>Lost: it arrived before the run and was dropped</td><td class="to">Held and replayed once the run arrives</td><td class="x">fixed</td></tr>
+          <tr><th>A council member reloading while the loot master rebuilds</th><td>Answered from the first raider's rows, half a run</td><td class="to">Waits about 4 s for the rebuild</td><td class="x">fixed</td></tr>
+          <tr><th>"No addon?" on raiders who have the addon</th><td>Each client judged for itself; a freshly reloaded one labelled them wrongly</td><td class="to">Every client labels by the loot master's verdict</td><td class="x">fixed</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ============================ Act two ============================ -->
+  <div class="act">
+    <div class="act-head cache">
+      <p class="eyebrow">Part two · 0.41.14</p>
+      <h2>The run-recovery cache, against both</h2>
+      <p class="prose">After the rework, a reload was the one thing still sending the run around again: a council member's recovery still moved 124 messages through the raid, and a raider's 7. The cache keeps each player's own copy of the run at logout. After a reload, the loot master checks a fingerprint of each item and sends only what changed. When nothing has, that is one small message.</p>
+    </div>
+
+    <div class="tiles">
+      <div class="tile">
+        <p class="label">A council member's reload, nothing changed: messages in the raid</p>
+        <div class="pair">
+          <div><span>After the rework</span><span class="v">124</span></div>
+          <div class="to"><span>With the cache</span><span class="v">2</span></div>
+        </div>
+        <p class="gain">62× fewer</p>
+        <p class="also">145× fewer than before the rework (291).</p>
+      </div>
+      <div class="tile">
+        <p class="label">A raider's reload: messages from the loot master</p>
+        <div class="pair">
+          <div><span>After the rework</span><span class="v">7</span></div>
+          <div class="to"><span>With the cache</span><span class="v">1</span></div>
+        </div>
+        <p class="gain">7× fewer</p>
+        <p class="also">10× fewer than before the rework. 2 messages for each item that changed.</p>
+      </div>
+      <div class="tile">
+        <p class="label">A wipe: 13 players reload</p>
+        <div class="pair">
+          <div><span>After the rework</span><span class="v">~96 s</span></div>
+          <div class="to"><span>With the cache</span><span class="v">~3 s</span></div>
+        </div>
+        <p class="gain">29× faster</p>
+        <p class="also">About 290× faster than before the rework (~16 min). 13 messages instead of 106 and 973.</p>
+      </div>
+      <div class="tile">
+        <p class="label">Run back after a council member's quiet reload, measured in game</p>
+        <div class="pair">
+          <div><span>After the rework</span><span class="v">0.8–4.5 s</span></div>
+          <div class="to"><span>With the cache</span><span class="v">~1 s</span></div>
+        </div>
+        <p class="gain">One message, 122 B</p>
+        <p class="also">Modelled at 30 × 24: ~87 s before the rework, ~2.6 s after, ~0.3 s now.</p>
+      </div>
+    </div>
+
+    <div class="charts">
+      <div class="chart-card">
+        <h3>Messages the loot master sends</h3>
+        <p class="sub">30 raiders × 24 items, nothing changed during the reload. Log scale: each gridline is ten times the last.</p>
+        <div id="chart-messages"></div>
+      </div>
+      <div class="chart-card">
+        <h3>Seconds until the run is back</h3>
+        <p class="sub">For the wipe, until the last of the 13 players is served. Throttle model, log scale.</p>
+        <div id="chart-time"></div>
+      </div>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th scope="col">30 raiders × 24 items</th>
+            <th scope="col"><span class="swatch sw-before"></span>Before the rework</th>
+            <th scope="col"><span class="swatch sw-rework"></span>After the rework</th>
+            <th scope="col"><span class="swatch sw-cache"></span>With the cache</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="group-row"><th colspan="4">Reloads · sizes measured in the client, times modelled</th></tr>
+          <tr><th>A council member reloads, nothing changed</th><td>291 messages, ~87 s</td><td>124 messages (12 from the loot master), ~2.6 s</td><td class="to">2 messages: a 197 B ask and a 134 B answer; ~0.3 s</td></tr>
+          <tr><th>The same, one item changed</th><td>291 messages</td><td>124 messages</td><td class="to">8 messages: the ask and 1,637 B in 7</td></tr>
+          <tr><th>The same, most items changed<br><span class="how">answers still arriving</span></th><td>291 messages</td><td>124 messages</td><td class="to">124 messages: the cache hands over to the parts</td></tr>
+          <tr><th>A raider reloads</th><td>10 messages</td><td>7 messages</td><td class="to">1 message (134 B), 2 more for each changed item</td></tr>
+          <tr><th>A wipe: 10 raiders and 3 council members reload</th><td>973 messages, ~16 min</td><td>106 messages, ~96 s</td><td class="to">13 messages, ~3 s</td></tr>
+          <tr class="group-row"><th colspan="4">Measured in game · three clients, 6-item test runs</th></tr>
+          <tr><th>A council member reloads, nothing changed</th><td>—</td><td>Run back in 0.8–4.5 s</td><td class="to">122 B in one message; run back ~1 s after asking</td></tr>
+          <tr><th>An award moved while the member was loading</th><td>—</td><td>—</td><td class="to">375 B in 2 messages; the copy's stale award replaced</td></tr>
+          <tr><th>A raider reloads, nothing changed</th><td>—</td><td>—</td><td class="to">148 B in one message</td></tr>
+          <tr class="group-row"><th colspan="4">Reliability</th></tr>
+          <tr><th>A council member's answers and votes when the loot master rebuilds while they reload</th><td>Lost</td><td>Lost</td><td class="to">Sent again from the copy: 6 answers and 1 vote came back in the game test</td></tr>
+          <tr><th>An answer still in the outbox at the moment of a reload</th><td>Lost</td><td>Lost</td><td class="to">Sent again from the copy</td></tr>
+          <tr><th>A run that ended while the player was logged out</th><td>Not brought back</td><td>Not brought back</td><td class="to">Not brought back: the copy is discarded when the loot master says there is no run</td></tr>
+          <tr class="group-row"><th colspan="4">What the cache costs</th></tr>
+          <tr><th>The ask a reload sends</th><td>24 B</td><td>24 B</td><td class="to">~197 B with every item's fingerprint; still one message</td></tr>
+          <tr><th>CPU during a recovery</th><td>—</td><td>—</td><td class="to">Fingerprinting a whole 30 × 24 copy: about 2 ms in a Lua interpreter, once per reload on each side</td></tr>
+          <tr><th>During the run</th><td>—</td><td>—</td><td class="to">Nothing: the copy is written once, at logout</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <section aria-labelledby="steps-h">
+    <h2 id="steps-h">How it got here</h2>
+    <div class="timeline">
+      <div class="step">
+        <span class="ver">0.40.8 – 0.40.12 · measuring</span>
+        <h3>Instruments first</h3>
+        <p><code>/slc perf</code>, <code>/slc stress</code> and <code>/slc comms</code>, and startup moved out of the game's shared loading hooks so the game's profiler charges SLC's time to SLC. Every figure on this page comes from these tools.</p>
+      </div>
+      <div class="step">
+        <span class="ver">0.40.13 · roster</span>
+        <h3>One roster service</h3>
+        <p>Roster changes are coalesced into one diff instead of a reaction to every raw roster event, and presence comes from the client that joins.</p>
+      </div>
+      <div class="step">
+        <span class="ver">0.41.0 · transport</span>
+        <h3>A new wire format and three lanes</h3>
+        <p>A probe showed the addon channel carries every byte unchanged, so the text encoding gave way to raw bytes in messages of up to 255 bytes. Traffic runs in three lanes (control, bulk, presence) under one byte budget.</p>
+        <p class="effect">A quarter fewer bytes and a third fewer messages; awards no longer wait behind bulk traffic</p>
+      </div>
+      <div class="step">
+        <span class="ver">0.41.1 · painting</span>
+        <h3>The redraw scheduler</h3>
+        <p>The council window paints after events, about once every 0.15 s at most, and updates rows in place instead of rebuilding the table on every answer.</p>
+        <p class="effect">The window's share of a 30 × 12 stress fell from 1,423 ms to 49 ms</p>
+      </div>
+      <div class="step">
+        <span class="ver">0.41.3 – 0.41.4 · answers and recovery traffic</span>
+        <h3>Batching, a logout save and quieter recovery</h3>
+        <p>A raider's answers leave as one batch. The loot master's copy of the run is built once at logout instead of on every message. Recovery asks the loot master directly, "no run" is said once, and messages that arrive before the run are held and replayed.</p>
+        <p class="effect">The cost of one answer stopped growing with the run</p>
+      </div>
+      <div class="step">
+        <span class="ver">0.41.5 – 0.41.9 · the remaining windows</span>
+        <h3>Everything on the scheduler</h3>
+        <p>Council, bags and history moved onto the roster service, bags travel as item strings, and every remaining window paints through the scheduler. The response window ignores other raiders' answers entirely.</p>
+        <p class="effect">An answer costs about 0.04 ms, and no stress frame passes 16.7 ms</p>
+      </div>
+      <div class="step">
+        <span class="ver">0.41.11 · recovery in parts</span>
+        <h3>A council member's recovery in parts</h3>
+        <p>The loot master sends a small skeleton, and every raider sends their own rows, so no single sender carries the whole run.</p>
+        <p class="effect">12 messages from the loot master instead of 66; seconds instead of about a minute</p>
+      </div>
+      <div class="step">
+        <span class="ver">0.41.12 – 0.41.13 · the rework's last fixes</span>
+        <h3>Correct labels and a safer rebuild</h3>
+        <p>The sweep carries the loot master's verdict, so every client labels silent raiders the same way. A council member reloading while the loot master rebuilds waits for the rebuild instead of getting half a run.</p>
+      </div>
+      <div class="step cache">
+        <span class="ver">0.41.14 · the run-recovery cache</span>
+        <h3>Every player keeps a copy</h3>
+        <p>Each player saves the run at logout. After a reload the loot master checks each item's fingerprint and sends only what changed, replacing anything out of date. The copy also puts back the player's own answers and votes if the run came back without them, and a run that ended while they were away stays ended.</p>
+        <p class="effect">A quiet reload: 2 messages instead of 124 for a council member, 1 instead of 7 for a raider</p>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="limits-h">
+    <h2 id="limits-h">Where it stops</h2>
+    <div>
+      <div class="panel">
+        <h3>What the cache does not change</h3>
+        <ul>
+          <li>Anything outside a reload: answers, votes and painting cost what the rework left them at.</li>
+          <li>A council member who reloads while answers are still pouring in: most items have changed, so the run comes in parts, as after the rework.</li>
+          <li>A crash writes no saved variables, so there is no copy to use.</li>
+          <li>A player who joins mid-run has no copy either.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <footer class="foot">
+    <p>Sizes: the game client's own encoder, through <code>/slc snapshotsize</code> (0.34.78 for the older text encoding; 0.41.10 to 0.41.14 since). CPU: <code>/slc stress</code>'s own stopwatch on 0.40.11 and on 0.41.8, the last stress baseline; nothing after 0.41.8 added work per answer. Times: a model of the game's per-prefix limit (10 messages at once, then one a second), with SLC's byte governor from 0.41.0 on (4,000 B, then 800 B/s), plus 0.3 s of latency.</p>
+    <p>Before 0.41.4, a council member's three asks, two seconds apart, were each answered with the whole run, because the first answer took over a minute to arrive. The cache was checked in game on three clients with 6-item runs.</p>
+  </footer>
+</div>
+
+<script>
+(function () {
+  var STATES = [
+    { key: "before", label: "Before" },
+    { key: "rework", label: "Rework" },
+    { key: "cache", label: "Cache" }
+  ];
+  var FRAMES = {
+    min: 0.5, max: 1500, ticks: [1, 10, 100, 1000],
+    fmt: function (v) { return v >= 1000 ? v.toLocaleString("en-US") : String(v); },
+    groups: [
+      { title: "A council member reloads", values: [291, 12, 1] },
+      { title: "A raider reloads", values: [10, 7, 1] },
+      { title: "A wipe: 13 players reload", values: [973, 106, 13] }
+    ]
+  };
+  var TIME = {
+    min: 0.1, max: 2000, ticks: [0.1, 1, 10, 100, 1000],
+    fmt: function (v) {
+      if (v >= 120) return "~" + Math.round(v / 60) + " min";
+      return (v < 10 ? v.toFixed(1) : Math.round(v)) + " s";
+    },
+    tickFmt: function (v) { return v < 1 ? "0.1 s" : v + " s"; },
+    groups: [
+      { title: "A council member reloads", values: [87, 2.6, 0.3] },
+      { title: "A wipe: the last of 13 served", values: [963, 96, 3.3] }
+    ]
+  };
+
+  var NS = "http://www.w3.org/2000/svg";
+  function node(tag, attrs, text) {
+    var n = document.createElementNS(NS, tag);
+    for (var k in attrs) n.setAttribute(k, attrs[k]);
+    if (text != null) n.textContent = text;
+    return n;
+  }
+
+  function draw(host, spec) {
+    var W = 460, left = 58, right = 64, top = 22, rowH = 20, gap = 6, groupGap = 22, titleH = 18;
+    var plotW = W - left - right;
+    var lo = Math.log10(spec.min), hi = Math.log10(spec.max);
+    function x(v) { return left + (Math.log10(v) - lo) / (hi - lo) * plotW; }
+    var H = top + spec.groups.length * (titleH + STATES.length * (rowH + gap) + groupGap) + 6;
+    var svg = node("svg", { viewBox: "0 0 " + W + " " + H, "class": "bars", role: "img" });
+    svg.setAttribute("aria-label", spec.groups.map(function (g) {
+      return g.title + ": " + g.values.map(function (v, i) { return STATES[i].label + " " + spec.fmt(v); }).join(", ");
+    }).join(". "));
+
+    spec.ticks.forEach(function (t) {
+      var g = node("g", { "class": "tick" });
+      g.appendChild(node("line", { x1: x(t), x2: x(t), y1: top - 6, y2: H - 6 }));
+      g.appendChild(node("text", { x: x(t), y: top - 10, "text-anchor": "middle" },
+        spec.tickFmt ? spec.tickFmt(t) : spec.fmt(t)));
+      svg.appendChild(g);
+    });
+
+    var y = top;
+    spec.groups.forEach(function (group) {
+      y += titleH;
+      svg.appendChild(node("text", { "class": "group", x: 0, y: y - 5 }, group.title));
+      group.values.forEach(function (v, i) {
+        var key = STATES[i].key;
+        var end = x(v);
+        svg.appendChild(node("text", { "class": "rowlabel", x: 0, y: y + rowH / 2 + 4 }, STATES[i].label));
+        svg.appendChild(node("rect", { "class": key, x: left, y: y, width: Math.max(2, end - left), height: rowH, rx: 3 }));
+        svg.appendChild(node("text", { "class": "val" + (key === "cache" ? " cache" : ""), x: end + 6, y: y + rowH / 2 + 4 }, spec.fmt(v)));
+        y += rowH + gap;
+      });
+      y += groupGap;
+    });
+    host.appendChild(svg);
+  }
+
+  draw(document.getElementById("chart-messages"), FRAMES);
+  draw(document.getElementById("chart-time"), TIME);
+})();
+</script>
+</body>
+</html>
