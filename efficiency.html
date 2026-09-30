@@ -119,6 +119,7 @@ tr.group-row th { background: var(--bg); font-family: var(--font-display); font-
 .two { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
 .panel { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 18px 20px; display: grid; gap: 10px; align-content: start; }
 .panel ul { margin: 0; padding-left: 18px; display: grid; gap: 8px; color: var(--ink-2); font-size: 15px; }
+.theme-toggle { justify-self: start; background: var(--surface); color: var(--ink-2); border: 1px solid var(--line); border-radius: 6px; font: inherit; font-size: 13px; padding: 5px 10px; cursor: pointer; }
 .foot { color: var(--ink-3); font-size: 13px; max-width: 82ch; display: grid; gap: 6px; }
 
 @media (max-width: 880px) {
@@ -135,9 +136,9 @@ tr.group-row th { background: var(--bg); font-family: var(--font-display); font-
 <body>
 <div class="wrap">
   <header>
-    <p class="eyebrow"><a href="/" style="color:inherit">← Simple Loot Council Guide</a></p>
     <p class="eyebrow">SimpleLootCouncil · 0.40.7 → 0.41.13 → 0.41.14 · 30 September 2026</p>
     <h1>Efficiency Scorecard</h1>
+    <button class="theme-toggle" type="button" id="theme-toggle">Toggle light / dark</button>
     <p class="thesis">The rework made each answer <b>140×</b> cheaper and cut a council member's reload from 291 addon messages to 124. The run-recovery cache then cut that reload to <b>2</b>.</p>
     <p class="prose">Two changes are measured here against the addon as it stood before them. The Full Comms and Efficiency Rework ran from 0.40.8 to 0.41.13. The run-recovery cache is 0.41.14, measured on its own against the addon after the rework and against the addon before it. Every size was measured in the game client, and every CPU figure in the game. Times come from a model of the game's message limits unless marked as measured in game.</p>
   </header>
@@ -494,6 +495,19 @@ tr.group-row th { background: var(--bg); font-family: var(--font-display); font-
 
   draw(document.getElementById("chart-messages"), FRAMES);
   draw(document.getElementById("chart-time"), TIME);
+})();
+</script>
+<script>
+(function () {
+  var root = document.documentElement, key = "slc-scorecard-theme";
+  try { var saved = localStorage.getItem(key); if (saved) root.setAttribute("data-theme", saved); } catch (e) {}
+  document.getElementById("theme-toggle").addEventListener("click", function () {
+    var cur = root.getAttribute("data-theme");
+    var dark = cur ? cur === "dark" : window.matchMedia("(prefers-color-scheme: dark)").matches;
+    var next = dark ? "light" : "dark";
+    root.setAttribute("data-theme", next);
+    try { localStorage.setItem(key, next); } catch (e) {}
+  });
 })();
 </script>
 </body>
